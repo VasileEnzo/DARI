@@ -1,0 +1,16 @@
+# Laravel
+/dari-api/vendor
+/dari-api/node_modules
+/dari-api/storage/*.key
+/dari-api/.env
+
+# React Native
+/dariApp/node_modules
+/dariApp/android/app/build
+/dariApp/ios/Pods
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
