@@ -5,55 +5,72 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    // Registro
+    // POST /api/register
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:6',
+        // Validación manual
+        $v = Validator::make($request->all(), [
+            'name'                  => 'required|string|max:255',
+            'email'                 => 'required|string|email|unique:users,email',
+            'password'              => 'required|string|min:6|confirmed', //password_confirmation
         ]);
 
+        if ($v->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors'  => $v->errors(),
+            ], 422);
+        }
+
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password'], // se hashea automático por el cast
+            'name'     => $request->name,
+            'email'    => $request->email,
+            
+            'password' => Hash::make($request->password),
         ]);
 
         $token = $user->createToken('mobile')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user'  => $user,
             'token' => $token,
-        ]);
+        ], 201);
     }
 
-    // Login
+    // POST /api/login
     public function login(Request $request)
     {
-        $validated = $request->validate([
-            'email' => 'required|string|email',
+        $v = Validator::make($request->all(), [
+            'email'    => 'required|string|email',
             'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $validated['email'])->first();
+        if ($v->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors'  => $v->errors(),
+            ], 422);
+        }
 
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Credenciales inválidas'], 401);
         }
 
         $token = $user->createToken('mobile')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user'  => $user,
             'token' => $token,
         ]);
     }
 
-    // Logout
+    // POST /api/logout (con auth:sanctum)
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Pressable, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { api } from '../services/api';
+import { Alert } from "react-native";
 
 export default function RegisterScreen({ navigation }: { navigation: any }) {
   const [name,setName] = useState('');
@@ -8,9 +10,27 @@ export default function RegisterScreen({ navigation }: { navigation: any }) {
   const [password,setPassword] = useState('');
   const [confirm,setConfirm] = useState('');
 
-  const onRegister = () => {
-    // validar y llamar a la API (POST /api/register)
-    console.log({ name, email, password, confirm });
+  const onRegister = async () => {
+  if(password !== confirm) {
+    Alert.alert("Las contraseñas no coinciden");
+    return;
+  }
+
+  try {
+    const response = await api.post('register', { 
+      name, 
+      email, 
+      password,
+    password_confirmation: confirm
+    });
+    console.log("Usuario registrado:", response.data);
+      Alert.alert("Registro exitoso 🎉");
+      navigation.replace("Login");
+
+    } catch (error: any) {
+      console.error(error.response?.data || error.message);
+      Alert.alert("Error al registrarse: " + (error.response?.data?.message || "Intenta de nuevo"));
+    }
   };
 
   return (

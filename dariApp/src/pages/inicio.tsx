@@ -19,8 +19,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
-    paddingHorizontal: 20,        // márgenes seguros laterales
+    paddingHorizontal: 20,        
   },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-  btnWrap: { alignSelf: 'stretch' }, // el Button no tiene style
+  btnWrap: { alignSelf: 'stretch' }, 
 });
