@@ -1,9 +1,10 @@
-// src/pages/Login.tsx
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from "react-native";
-import { api, setToken } from "../services/api";
+import { api, setToken as setApiToken } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginScreen({ navigation }: { navigation: any }) {
+  const { setToken } = useAuth();           
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -12,11 +13,14 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
     try {
       setLoading(true);
       const { data } = await api.post("/login", { email, password });
-      // guardamos *solo en memoria*
+
+      
       setToken(data.token);
 
+      
+
       Alert.alert("OK", "Sesión iniciada");
-      navigation.replace("Welcome"); 
+      navigation.replace("Home");
     } catch (err: any) {
       const msg = err.response?.data?.message || "Error al iniciar sesión";
       Alert.alert("Error", msg);
