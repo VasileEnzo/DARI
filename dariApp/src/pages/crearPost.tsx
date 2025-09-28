@@ -6,14 +6,24 @@ import { api } from '../services/api';
 
 type Option = { id:number; name:string };
 
+//Opciones
+const TYPES: Option[] = [
+  { id: 1, name: 'Prueba' },
+  { id: 2, name: 'incident' },
+  { id: 3, name: 'Prueba3' },
+  { id: 4, name: 'Prueba4' },
+];
+
 export default function CrearPost({ navigation }: { navigation:any }) {
   const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
+  const [description, setDescription] = useState('');
 
   const [categories, setCategories] = useState<Option[]>([]);
   const [states, setStates] = useState<Option[]>([]);
   const [categoryId, setCategoryId] = useState<number | undefined>();
   const [stateId, setStateId] = useState<number | undefined>();
+  const [type, setType] = useState<string | undefined>();
+
   const [loading, setLoading] = useState(false);
   const [loadingOptions, setLoadingOptions] = useState(true);
 
@@ -36,16 +46,18 @@ export default function CrearPost({ navigation }: { navigation:any }) {
   }, []);
 
   const onSubmit = async () => {
-    if (!title.trim()) return Alert.alert('Ups', 'El título es obligatorio');
-    if (!body.trim()) return Alert.alert('Ups', 'El contenido es obligatorio');
-    if (!categoryId) return Alert.alert('Ups', 'Seleccioná una categoría');
-    if (!stateId) return Alert.alert('Ups', 'Seleccioná un estado');
+    if (!title.trim()) return Alert.alert('El título es obligatorio');
+    if (!description.trim()) return Alert.alert('El contenido es obligatorio');
+    if (!categoryId) return Alert.alert('Seleccioná una categoría');
+    if (!type) return Alert.alert('Seleccioná un tipo');
+    if (!stateId) return Alert.alert('Seleccioná un estado');
 
     const payload = {
       title: title.trim(),
-      body: body.trim(),
+      description: description.trim(),
       category_id: categoryId,
       state_id: stateId,
+      type: type,
     };
 
     try {
@@ -85,8 +97,8 @@ export default function CrearPost({ navigation }: { navigation:any }) {
       <TextInput
         style={[styles.input, styles.multiline]}
         placeholder="Contenido"
-        value={body}
-        onChangeText={setBody}
+        value={description}
+        onChangeText={setDescription}
         multiline
         numberOfLines={6}
         textAlignVertical="top"
@@ -101,6 +113,19 @@ export default function CrearPost({ navigation }: { navigation:any }) {
           <Picker.Item label="Seleccionar…" value={undefined} />
           {categories.map(c => (
             <Picker.Item key={c.id} label={c.name} value={c.id} />
+          ))}
+        </Picker>
+      </View>
+
+      <Text style={styles.label}>Tipo</Text>
+      <View style={styles.pickerWrap}>
+        <Picker
+          selectedValue={type}
+          onValueChange={(val) => setType(val)}
+        >
+          <Picker.Item label="Seleccionar…" value={undefined} />
+          {TYPES.map(t => (
+            <Picker.Item key={t.id} label={t.name} value={t.name} />
           ))}
         </Picker>
       </View>
